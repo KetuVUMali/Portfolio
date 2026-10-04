@@ -399,7 +399,8 @@
 
   // Experience entries are stacked. Keep each row as one animation rather
   // than nesting several AOS transforms; nested transforms can leave text
-  // visually delayed. These rows replay whenever the section is revisited.
+  // visually delayed. These rows replay (both directions) whenever the
+  // section is revisited, via the global once/mirror settings below.
   document.querySelectorAll(".feature-three-wrapper").forEach(function (wrapper) {
     var setFeatureAos = function (element, animation, duration, delay) {
       if (!element) return;
@@ -409,16 +410,18 @@
     };
     var clearFeatureAos = function (element) {
       if (!element) return;
-      ["data-aos", "data-aos-duration", "data-aos-delay", "data-aos-once", "data-aos-mirror"].forEach(function (attribute) {
+      ["data-aos", "data-aos-duration", "data-aos-delay"].forEach(function (attribute) {
         element.removeAttribute(attribute);
       });
     };
     clearFeatureAos(wrapper);
 
     wrapper.querySelectorAll(".feature-three-single").forEach(function (card, index) {
-      setFeatureAos(card, "fade-up", 700, index * 1000);
-      card.setAttribute("data-aos-once", "false");
-      card.setAttribute("data-aos-mirror", "true");
+      // Each entry already enters the viewport at its own scroll position
+      // (they're stacked, not side by side), so this only needs a small
+      // settle-in stagger - not a growing multi-second wait for later rows.
+      var stagger = Math.min(index * 150, 450);
+      setFeatureAos(card, "fade-up", 700, stagger);
 
       clearFeatureAos(card.querySelector(".feature-three-item"));
       card.querySelectorAll(".feature-three-text, .experience-details-toggle").forEach(clearFeatureAos);
@@ -426,13 +429,28 @@
   });
 
   // Skill logos reveal independently as each card enters the viewport.
+  // Stagger by column position with valid 50ms-step delays matching aos.css
+  // (100ms - 450ms) so each row cascades gracefully left-to-right.
   document.querySelectorAll(".skills-grid").forEach(function (grid) {
-    grid.querySelectorAll(".skill-logo").forEach(function (logo) {
-      logo.setAttribute("data-aos", "fade-up");
-      logo.setAttribute("data-aos-duration", "600");
-      logo.setAttribute("data-aos-delay", "0");
-      logo.setAttribute("data-aos-anchor-placement", "top-bottom");
-      logo.setAttribute("data-aos-offset", "80");
+    grid.querySelectorAll(".skill-logo").forEach(function (logo, index) {
+      var col = index % 4;
+      var row = Math.floor(index / 4);
+      var stagger = 100 + (col * 100) + ((row % 2) * 50);
+      if (!logo.getAttribute("data-aos")) {
+        logo.setAttribute("data-aos", "fade-up");
+      }
+      if (!logo.getAttribute("data-aos-duration")) {
+        logo.setAttribute("data-aos-duration", "700");
+      }
+      if (!logo.getAttribute("data-aos-delay")) {
+        logo.setAttribute("data-aos-delay", String(stagger));
+      }
+      if (!logo.getAttribute("data-aos-offset")) {
+        logo.setAttribute("data-aos-offset", "100");
+      }
+      if (!logo.getAttribute("data-aos-easing")) {
+        logo.setAttribute("data-aos-easing", "ease-out-cubic");
+      }
     });
   });
 
@@ -440,6 +458,10 @@
     // Reveal each section slightly before it reaches the viewport centre.
     // This keeps the staggered delays readable without making visitors wait.
     once: false,
+    // Reverse (mirror) is on globally: elements animate out, in the
+    // opposite direction, when scrolled back past going up - not just on
+    // the way down. Requires once: false to have any visible effect.
+    mirror: true,
     offset: 90,
     duration: 800,
     easing: "ease-out-cubic",
