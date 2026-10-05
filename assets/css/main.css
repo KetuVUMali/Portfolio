@@ -8747,6 +8747,25 @@ body.tw-magic-cursor #magic-cursor {
     margin-top: 15px;
   }
 }
+
+.resume-download-btn .resume-btn-icon {
+  color: var(--main-two-600);
+  transition: color 0.3s ease, transform 0.2s ease;
+  display: inline-block;
+  vertical-align: middle;
+}
+
+.resume-download-btn:hover .resume-btn-icon {
+  color: #ffffff !important;
+  transform: translateY(-2px);
+}
+
+.resume-download-btn:active .resume-btn-icon,
+.resume-download-btn:focus .resume-btn-icon {
+  color: #ffffff !important;
+  transform: scale(0.92);
+}
+
 .banner-three-line-shape {
   inset-block-end: 13%;
 }
@@ -8961,6 +8980,7 @@ body.tw-magic-cursor #magic-cursor {
     inset-block-start: -33px;
   }
 }
+
 @media screen and (max-width: 575px) {
   .about-three-title {
     font-size: 2rem;
