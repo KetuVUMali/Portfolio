@@ -39,28 +39,42 @@
     });
   }
   smoothSctoll();
+  gsap.registerPlugin(ScrollTrigger);
+  gsap.config({
+    nullTargetWarn: false,
+  });
+  // Fewer redundant ScrollTrigger callbacks while scrolling.
+  ScrollTrigger.config({ limitCallbacks: true, ignoreMobileResize: true });
+
   if ($("#smooth-wrapper").length && $("#smooth-content").length) {
-    gsap.registerPlugin(
-      ScrollTrigger,
-      ScrollSmoother,
-      TweenMax,
-      ScrollToPlugin,
-    );
-    gsap.config({
-      nullTargetWarn: false,
-    });
-    let smoother = ScrollSmoother.create({
-      smoothTouch: 0.2,
-      smooth: 4,
-      effects: true,
-      normalizeScroll: false,
-      ignoreMobileResize: true,
-    });
-    // Expose the smoother instance so other scripts (see main.js's in-page
-    // anchor navigation) can route section-link clicks through it. Without
-    // this, plain browser anchor jumps fight with ScrollSmoother's own
-    // transform-based scroll position and can look abrupt or desynced.
-    window.twSmoother = smoother;
+    gsap.registerPlugin(ScrollSmoother);
+    // Scrolling performance:
+    //  - smooth: 4 made the page trail the wheel by ~4 seconds (it felt
+    //    "stuck" and kept the page re-rendering long after you stopped).
+    //    1.2 keeps the same silky glide but catches up almost instantly.
+    //  - Touch / coarse-pointer devices (phones, tablets) use the browser's
+    //    own native scrolling. It is hardware accelerated, has real
+    //    momentum, never lags behind a finger, and avoids a giant
+    //    transformed layer that was very heavy on mobile GPUs.
+    //  - Users who prefer reduced motion also get native scrolling.
+    //  - effects:false skips scanning for data-speed / data-lag attributes
+    //    (none are used on this page).
+    var preferNativeScroll =
+      window.matchMedia("(hover: none), (pointer: coarse)").matches ||
+      window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    if (!preferNativeScroll) {
+      let smoother = ScrollSmoother.create({
+        smooth: 1.2,
+        effects: false,
+        normalizeScroll: false,
+        ignoreMobileResize: true,
+      });
+      // Expose the smoother instance so other scripts (see main.js's in-page
+      // anchor navigation) can route section-link clicks through it. Without
+      // this, plain browser anchor jumps fight with ScrollSmoother's own
+      // transform-based scroll position and can look abrupt or desynced.
+      window.twSmoother = smoother;
+    }
   }
 
   ////////////////////////////////////////////////////
@@ -392,13 +406,9 @@
     });
     let mySplitText = new SplitText(".animated-title", { type: "words,chars" });
     let chars = mySplitText.chars;
-    let endGradient = chroma.scale([
-      "#ffff",
-      "#ffff",
-      "#ffff",
-      "#ffff",
-      "#ffff",
-    ]);
+    // (chroma.js was only used to build an all-white "gradient"; a constant
+    // is identical and saves an 80 KB script.)
+    let endGradient = () => ({ hex: () => "#ffffff" });
     cta.to(chars, {
       duration: 0.5,
       scaleY: 0.6,
@@ -628,15 +638,6 @@
 
   ///////////////////////
   // 11. Portfolio Three Effect
-  gsap.to(".portfolio-three-shape", {
-    scrollTrigger: {
-      trigger: ".portfolio-three-area",
-      start: "top center-=200",
-      pin: ".portfolio-three-shape",
-      end: "bottom bottom-=200",
-      markers: false,
-      pinSpacing: false,
-      scrub: 1,
-    },
-  });
+  // (the big "works" watermark is now plain decorative CSS; it no longer needs a
+  // ScrollTrigger pin, which fought the card grid layout)
 })(jQuery);

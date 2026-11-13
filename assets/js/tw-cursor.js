@@ -27,19 +27,52 @@ if ($("body").not(".is-mobile").hasClass("tw-magic-cursor")) {
     opacity: $ballOpacity,
   });
 
-  document.addEventListener("mousemove", mouseMove);
+  // Performance: the follow-the-mouse loop only runs while the ball is still
+  // catching up with the pointer (it used to run on every animation frame
+  // forever), and the cursor is only faded in when it was actually hidden
+  // (it used to create a brand-new GSAP tween on every single mousemove
+  // event, i.e. hundreds per second while scrolling with the mouse).
+  var $cursorShown = false;
+  var $following = false;
+
+  function showCursor() {
+    if ($cursorShown) return;
+    $cursorShown = true;
+    gsap.to("#magic-cursor", { duration: 0.3, autoAlpha: 1, overwrite: "auto" });
+  }
+
+  function hideCursor() {
+    $cursorShown = false;
+    gsap.to("#magic-cursor", { duration: 0.3, autoAlpha: 0, overwrite: "auto" });
+  }
+
+  document.addEventListener("mousemove", mouseMove, { passive: true });
 
   function mouseMove(e) {
     $mouse.x = e.clientX;
     $mouse.y = e.clientY;
+    showCursor();
+    if (!$following) {
+      $following = true;
+      gsap.ticker.add(updatePosition);
+    }
   }
-
-  gsap.ticker.add(updatePosition);
 
   function updatePosition() {
     if (!$active) {
-      $pos.x += ($mouse.x - $pos.x) * $ratio;
-      $pos.y += ($mouse.y - $pos.y) * $ratio;
+      var dx = $mouse.x - $pos.x;
+      var dy = $mouse.y - $pos.y;
+      if (Math.abs(dx) < 0.1 && Math.abs(dy) < 0.1) {
+        // Caught up: snap, then stop ticking until the mouse moves again.
+        $pos.x = $mouse.x;
+        $pos.y = $mouse.y;
+        gsap.set($ball, { x: $pos.x, y: $pos.y });
+        gsap.ticker.remove(updatePosition);
+        $following = false;
+        return;
+      }
+      $pos.x += dx * $ratio;
+      $pos.y += dy * $ratio;
 
       gsap.set($ball, { x: $pos.x, y: $pos.y });
     }
@@ -77,16 +110,13 @@ if ($("body").not(".is-mobile").hasClass("tw-magic-cursor")) {
   // Show/hide on document leave/enter//
   $(document)
     .on("mouseleave", function () {
-      gsap.to("#magic-cursor", { duration: 0.3, autoAlpha: 0 });
+      hideCursor();
     })
     .on("mouseenter", function () {
-      gsap.to("#magic-cursor", { duration: 0.3, autoAlpha: 1 });
+      showCursor();
     });
 
-  // Show as the mouse moves//
-  $(document).mousemove(function () {
-    gsap.to("#magic-cursor", { duration: 0.3, autoAlpha: 1 });
-  });
+  // (Showing the cursor as the mouse moves is handled in mouseMove above.)
 
   // Cursor view on hover (data attribute "data-cursor="...").
   $("[data-cursor]").each(function () {

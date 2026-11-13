@@ -30,6 +30,14 @@
   // 00. Security - Disable Right Click, Copy, and Content Protection
   ////////////////////////////////////////////////////
 
+  // The protections below apply to page content only. Form fields (contact
+  // form, chatbot input) must stay fully usable: calling preventDefault on
+  // mousedown/selectstart/paste for them made it impossible to click into the
+  // fields or paste an email address.
+  function isEditableTarget(t) {
+    return !!(t && t.closest && t.closest("input, textarea, select, [contenteditable='true']"));
+  }
+
   // Disable Right Click Context Menu
   document.addEventListener("contextmenu", function (e) {
     e.preventDefault();
@@ -38,34 +46,38 @@
 
   // Disable Text Selection
   document.addEventListener("selectstart", function (e) {
+    if (isEditableTarget(e.target)) return;
     e.preventDefault();
     return false;
   });
 
   document.addEventListener("mousedown", function (e) {
+    if (isEditableTarget(e.target)) return;
     e.preventDefault();
     return false;
   }, true);
 
   // Disable Keyboard Shortcuts (Ctrl+C, Ctrl+V, Ctrl+X, Ctrl+S, Ctrl+A, Ctrl+U, F12)
   document.addEventListener("keydown", function (e) {
+    // Let people copy / paste / cut / select-all inside form fields.
+    var editable = isEditableTarget(e.target);
     // Ctrl+C - Copy
-    if ((e.ctrlKey || e.metaKey) && e.keyCode === 67) {
+    if (!editable && (e.ctrlKey || e.metaKey) && e.keyCode === 67) {
       e.preventDefault();
       return false;
     }
     // Ctrl+V - Paste
-    if ((e.ctrlKey || e.metaKey) && e.keyCode === 86) {
+    if (!editable && (e.ctrlKey || e.metaKey) && e.keyCode === 86) {
       e.preventDefault();
       return false;
     }
     // Ctrl+X - Cut
-    if ((e.ctrlKey || e.metaKey) && e.keyCode === 88) {
+    if (!editable && (e.ctrlKey || e.metaKey) && e.keyCode === 88) {
       e.preventDefault();
       return false;
     }
     // Ctrl+A - Select All
-    if ((e.ctrlKey || e.metaKey) && e.keyCode === 65) {
+    if (!editable && (e.ctrlKey || e.metaKey) && e.keyCode === 65) {
       e.preventDefault();
       return false;
     }
@@ -93,29 +105,34 @@
 
   // Disable Drag and Drop
   document.addEventListener("dragstart", function (e) {
+    if (isEditableTarget(e.target)) return;
     e.preventDefault();
     return false;
   });
 
   document.addEventListener("drop", function (e) {
+    if (isEditableTarget(e.target)) return;
     e.preventDefault();
     return false;
   });
 
   // Disable Copy from paste event
   document.addEventListener("copy", function (e) {
+    if (isEditableTarget(e.target)) return;
     e.preventDefault();
     return false;
   });
 
   // Disable Cut from cut event
   document.addEventListener("cut", function (e) {
+    if (isEditableTarget(e.target)) return;
     e.preventDefault();
     return false;
   });
 
   // Disable Paste from paste event
   document.addEventListener("paste", function (e) {
+    if (isEditableTarget(e.target)) return;
     e.preventDefault();
     return false;
   });
@@ -154,7 +171,11 @@
 
   ////////////////////////////////////////////////////
   // 01. PreLoader Js
-  document.addEventListener("DOMContentLoaded", () => {
+  // The animation (text lift -> curve -> flatten -> slide up) is unchanged; the
+  // old 1s initial delay and slow segments added ~1.2s of pure waiting before
+  // the page could be seen, so they are trimmed.
+  function runPreloader() {
+    if (!document.querySelector(".preloader")) return;
     // Create GSAP timeline
     const tl = gsap.timeline();
     const svg = document.getElementById("preloaderSvg");
@@ -162,27 +183,32 @@
     const flat = "M0 2S175 1 500 1s500 1 500 1V0H0Z";
     // Text animation
     tl.to(".preloader-heading .load-text, .preloader-heading .cont", {
-      delay: 1,
+      delay: 0.2,
       y: -80,
       opacity: 0,
-      duration: 0.6,
+      duration: 0.5,
     })
       // SVG curve animation
       .to(svg, {
-        duration: 0.6,
+        duration: 0.5,
         attr: { d: curve },
         ease: "power2.inOut",
       })
       // Flatten SVG
       .to(svg, {
-        duration: 0.6,
+        duration: 0.5,
         attr: { d: flat },
         ease: "power2.inOut",
+      })
+      // Curtain starts lifting: start the page's reveal animations now so the
+      // hero animates in as it becomes visible.
+      .add(function () {
+        document.dispatchEvent(new Event("twPreloaderDone"));
       })
       // Slide preloader up
       .to(".preloader", {
         y: "-130%",
-        duration: 0.8,
+        duration: 0.7,
         ease: "power4.inOut",
       })
       // Remove from DOM flow
@@ -190,17 +216,40 @@
         display: "none",
         zIndex: -1,
       });
-  });
+  }
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", runPreloader);
+  } else {
+    runPreloader();
+  }
 
   ////////////////////////////////////////////////////
   // 02. Sticky Js
-  $(window).on("scroll", function () {
-    if ($(window).scrollTop() >= 260) {
-      $(".header").addClass("fixed-header");
-    } else {
-      $(".header").removeClass("fixed-header");
+  (function () {
+    var $header = $(".header");
+    var isFixed = false;
+    var ticking = false;
+    function updateHeader() {
+      ticking = false;
+      var y = window.pageYOffset || document.documentElement.scrollTop || 0;
+      var shouldFix = y >= 260;
+      if (shouldFix !== isFixed) {
+        isFixed = shouldFix;
+        $header.toggleClass("fixed-header", shouldFix);
+      }
     }
-  });
+    window.addEventListener(
+      "scroll",
+      function () {
+        if (!ticking) {
+          ticking = true;
+          window.requestAnimationFrame(updateHeader);
+        }
+      },
+      { passive: true }
+    );
+    updateHeader();
+  })();
 
   ////////////////////////////////////////////////////
   // 03. Menu Controls JS
@@ -340,116 +389,129 @@
   });
 
   ////////////////////////////////////////////////////
-  // 07. AOS Js
-  // Project cards repeat in a three-column grid. Give every card the same
-  // internal reveal sequence and only stagger cards within their own row.
-  // Setting these attributes before AOS initializes keeps the timing stable
-  // even when cards or technologies are added later.
+  // 07. AOS Js  (scroll-reveal animations)
+  //
+  // How the reveals are organised (one clear rule per kind of element):
+  //  - Hero: plays AFTER the preloader lifts (it used to finish behind the
+  //    preloader, so visitors never saw it).
+  //  - Section headings / text blocks: fade-up (as authored in the HTML).
+  //  - Cards (projects, portfolio, services, about column): the CARD animates as
+  //    one unit. Nothing inside a card animates on its own any more - 248 of the
+  //    323 animated elements used to sit inside another animated element, which
+  //    produced doubled, jittery motion (and animated the live-preview iframes).
+  //  - Cards in the same row are staggered left -> right.
+  //  - Hover effects keep working after the reveal (see "after reveal" below).
+  var AOS_REPLAY = false; // true = animations replay when scrolling back up
+
+  function setAos(element, animation, duration, delay) {
+    if (!element) return;
+    element.setAttribute("data-aos", animation);
+    element.setAttribute("data-aos-duration", duration);
+    element.setAttribute("data-aos-delay", delay);
+  }
+  function clearAos(element) {
+    ["data-aos", "data-aos-duration", "data-aos-delay", "data-aos-offset", "data-aos-easing"].forEach(function (attribute) {
+      element.removeAttribute(attribute);
+    });
+  }
+  // Remove AOS from everything inside the given containers (the container itself keeps its own).
+  function flattenAos(selector) {
+    document.querySelectorAll(selector).forEach(function (container) {
+      container.querySelectorAll("[data-aos]").forEach(clearAos);
+    });
+  }
+
+  // Project cards: 3-column grid -> stagger within each row (0 / 120 / 240 ms).
   document.querySelectorAll(".react-project-card").forEach(function (card, index) {
-    var setAos = function (element, animation, duration, delay) {
-      if (!element) return;
-      element.setAttribute("data-aos", animation);
-      element.setAttribute("data-aos-duration", duration);
-      element.setAttribute("data-aos-delay", delay);
-    };
-    var stagger = (index % 3) * 120;
-    setAos(card, "fade-up", 800, stagger);
-
-    var preview = card.querySelector(".react-project-preview");
-    var body = card.querySelector(".react-project-card-body");
-    setAos(preview, "zoom-in", 650, 80);
-    setAos(card.querySelector(".react-project-browser-bar"), "fade-down", 500, 110);
-    setAos(card.querySelector(".react-project-iframe-wrap"), "fade-up", 650, 150);
-    setAos(card.querySelector(".react-project-preview-label"), "fade-up", 500, 200);
-    setAos(body, "fade-up", 650, 160);
-    setAos(card.querySelector(".react-project-meta"), "fade-right", 500, 220);
-    setAos(card.querySelector("h3"), "fade-up", 550, 270);
-    setAos(body && body.querySelector("p"), "fade-up", 550, 320);
-    setAos(card.querySelector(".react-project-tags"), "fade-up", 500, 370);
-    card.querySelectorAll(".react-project-tags li").forEach(function (tag, tagIndex) {
-      setAos(tag, "fade-up", 450, 400 + tagIndex * 30);
-    });
-    setAos(card.querySelector(".react-project-link"), "fade-up", 500, 460);
+    setAos(card, "fade-up", 800, (index % 3) * 120);
   });
+  flattenAos(".react-project-card");
 
-  // Portfolio cards use a two-column layout, so restart the small stagger on
-  // each row and reveal the card's content in reading order.
+  // Portfolio (work) cards: 2-column layout -> stagger 0 / 140 ms per row.
   document.querySelectorAll(".portfolio-three-wrapper").forEach(function (wrapper) {
-    var setPortfolioAos = function (element, animation, duration, delay) {
-      if (!element) return;
-      element.setAttribute("data-aos", animation);
-      element.setAttribute("data-aos-duration", duration);
-      element.setAttribute("data-aos-delay", delay);
-    };
-    setPortfolioAos(wrapper, "fade-up", 800, 0);
-
+    clearAos(wrapper);
     wrapper.querySelectorAll(".portfolio-three-item").forEach(function (card, index) {
-      var stagger = (index % 2) * 140;
-      setPortfolioAos(card, "fade-up", 800, stagger);
-      setPortfolioAos(card.querySelector(".portfolio-three-wrap"), "fade-up", 650, 100);
-      setPortfolioAos(card.querySelector("h2"), "fade-up", 600, 170);
-      setPortfolioAos(card.querySelector(".portfolio-three-list"), "fade-up", 500, 230);
-      card.querySelectorAll(".portfolio-three-list li").forEach(function (tag, tagIndex) {
-        setPortfolioAos(tag, "fade-up", 450, 270 + tagIndex * 50);
-      });
-      setPortfolioAos(card.querySelector(".portfolio-three-button"), "zoom-in", 500, 260);
-      setPortfolioAos(card.querySelector(".portfolio-thumb"), "zoom-in", 700, 350);
+      setAos(card, "fade-up", 800, (index % 2) * 140);
     });
   });
+  flattenAos(".portfolio-three-item");
 
-  // Experience entries are stacked. Keep each row as one animation rather
-  // than nesting several AOS transforms; nested transforms can leave text
-  // visually delayed. These rows replay whenever the section is revisited.
+  // Experience rows: each row is one animation (small settle-in stagger).
   document.querySelectorAll(".feature-three-wrapper").forEach(function (wrapper) {
-    var setFeatureAos = function (element, animation, duration, delay) {
-      if (!element) return;
-      element.setAttribute("data-aos", animation);
-      element.setAttribute("data-aos-duration", duration);
-      element.setAttribute("data-aos-delay", delay);
-    };
-    var clearFeatureAos = function (element) {
-      if (!element) return;
-      ["data-aos", "data-aos-duration", "data-aos-delay", "data-aos-once", "data-aos-mirror"].forEach(function (attribute) {
-        element.removeAttribute(attribute);
-      });
-    };
-    clearFeatureAos(wrapper);
-
-    wrapper.querySelectorAll(".feature-three-single").forEach(function (card, index) {
-      setFeatureAos(card, "fade-up", 700, index * 1000);
-      card.setAttribute("data-aos-once", "false");
-      card.setAttribute("data-aos-mirror", "true");
-
-      clearFeatureAos(card.querySelector(".feature-three-item"));
-      card.querySelectorAll(".feature-three-text, .experience-details-toggle").forEach(clearFeatureAos);
+    clearAos(wrapper);
+    wrapper.querySelectorAll(".feature-three-single").forEach(function (row, index) {
+      setAos(row, "fade-up", 700, Math.min(index * 120, 360));
     });
   });
+  flattenAos(".feature-three-single");
 
-  // Skill logos reveal independently as each card enters the viewport.
+  // Services rows, About text column: unit animations too.
+  flattenAos(".service-three-single");
+  flattenAos(".about-three-right");
+
+  // Skill logos: independent reveals, staggered by column.
   document.querySelectorAll(".skills-grid").forEach(function (grid) {
-    grid.querySelectorAll(".skill-logo").forEach(function (logo) {
-      logo.setAttribute("data-aos", "fade-up");
-      logo.setAttribute("data-aos-duration", "600");
-      logo.setAttribute("data-aos-delay", "0");
-      logo.setAttribute("data-aos-anchor-placement", "top-bottom");
-      logo.setAttribute("data-aos-offset", "80");
+    grid.querySelectorAll(".skill-logo").forEach(function (logo, index) {
+      var col = index % 4;
+      var row = Math.floor(index / 4);
+      setAos(logo, "fade-up", 700, 100 + col * 100 + (row % 2) * 50);
+      logo.setAttribute("data-aos-offset", "100");
+      logo.setAttribute("data-aos-easing", "ease-out-cubic");
     });
   });
 
+  // The reveal waits for the preloader (event fired in section 01 below).
+  var hasPreloader = !!document.querySelector(".preloader");
   AOS.init({
-    // Reveal each section slightly before it reaches the viewport centre.
-    // This keeps the staggered delays readable without making visitors wait.
-    once: false,
+    startEvent: hasPreloader ? "twPreloaderDone" : "DOMContentLoaded",
+    once: !AOS_REPLAY,
+    mirror: AOS_REPLAY,
     offset: 90,
     duration: 800,
     easing: "ease-out-cubic",
     anchorPlacement: "top-bottom",
+    // All data-aos nodes exist before init, so the body-wide MutationObserver
+    // isn't needed.
+    disableMutationObserver: true,
     disable: function () {
       // Respect users who prefer reduced motion: skip AOS animation
       // entirely for them so content is immediately visible.
       return window.matchMedia("(prefers-reduced-motion: reduce)").matches;
     },
   });
+  // Safety net: if the preloader timeline never fires (e.g. GSAP blocked),
+  // still reveal the page.
+  if (hasPreloader) {
+    setTimeout(function () {
+      document.dispatchEvent(new Event("twPreloaderDone"));
+    }, 6000);
+  }
+
+  // After reveal: AOS leaves its long duration/delay on the element, which made
+  // hover effects (card lift, border colour) sluggish and delayed, and its
+  // transform overrode the cards' hover transform. Once a card has finished
+  // revealing, hand its transitions back to normal hover timing.
+  // (This AOS build has no events, so watch the cards' class list instead.)
+  if (window.MutationObserver) {
+    var cardObserver = new MutationObserver(function (records) {
+      records.forEach(function (record) {
+        var node = record.target;
+        if (!node.classList.contains("aos-animate") || node.getAttribute("data-reveal-done")) return;
+        node.setAttribute("data-reveal-done", "1");
+        var total = (parseInt(node.getAttribute("data-aos-duration"), 10) || 800) + (parseInt(node.getAttribute("data-aos-delay"), 10) || 0);
+        setTimeout(function () {
+          node.style.transitionDelay = "0s";
+          node.style.transitionDuration = "0.4s";
+          node.style.transitionProperty = "transform, translate, box-shadow, border-color, background-color";
+        }, total + 80);
+      });
+    });
+    document
+      .querySelectorAll(".react-project-card, .portfolio-three-item, .service-three-single, .feature-three-single")
+      .forEach(function (node) {
+        cardObserver.observe(node, { attributes: true, attributeFilter: ["class"] });
+      });
+  }
 
   // ScrollSmoother, web fonts, and project previews can change element
   // positions after the first paint. Refreshing once the page is complete
@@ -477,7 +539,11 @@
 
     btn.on("click", function (e) {
       e.preventDefault();
-      $("html, body").animate({ scrollTop: 0 }, 300);
+      if (window.twSmoother && typeof window.twSmoother.scrollTo === "function") {
+        window.twSmoother.scrollTo(0, true);
+      } else {
+        window.scrollTo({ top: 0, behavior: "smooth" });
+      }
     });
   }
   back_to_top();
@@ -498,11 +564,24 @@
 
   ////////////////////////////////////////////////////
   // 09. Magnific Popup Js
-  $(".open-popup").magnificPopup({
-    type: "iframe",
-    removalDelay: 300,
-    mainClass: "mfp-fade",
-  });
+  // The only .open-popup links live in the hidden (d-none) testimonial block,
+  // so the plugin (JS + CSS) is fetched on demand, only if one becomes visible.
+  var popupTriggers = $(".open-popup");
+  if (popupTriggers.length && popupTriggers[0].getClientRects().length) {
+    window.twLoadAssets(
+      {
+        css: ["assets/css/magnific-popup.css"],
+        js: ["assets/js/magnific-popup.min.js"],
+      },
+      function () {
+        popupTriggers.magnificPopup({
+          type: "iframe",
+          removalDelay: 300,
+          mainClass: "mfp-fade",
+        });
+      }
+    );
+  }
 
   ////////////////////////////////////////////////////
   // 10. Counter Js
@@ -1051,9 +1130,98 @@
       }
     });
   }
+  var scaleQueued = false;
+  function queueScaleProjectIframePreviews() {
+    if (scaleQueued) return;
+    scaleQueued = true;
+    window.requestAnimationFrame(function () {
+      scaleQueued = false;
+      scaleProjectIframePreviews();
+    });
+  }
   window.addEventListener("load", scaleProjectIframePreviews);
-  window.addEventListener("resize", scaleProjectIframePreviews);
+  window.addEventListener("resize", queueScaleProjectIframePreviews, { passive: true });
   document.addEventListener("DOMContentLoaded", scaleProjectIframePreviews);
   setTimeout(scaleProjectIframePreviews, 600);
   setTimeout(scaleProjectIframePreviews, 1500);
+
+  ////////////////////////////////////////////////////
+  // 17. Live Project Iframe Loading (the biggest scroll/jank fix)
+  // The page embeds 14 complete external websites as live previews. Loading
+  // all of them (each with its own CSS, JS, images and animations) and keeping
+  // them all running made loading and scrolling stutter on laptops and
+  // phones. The previews look exactly the same, but each one is now only
+  // loaded while it is on / near the screen, and released again once it is
+  // well out of view. At most a handful are alive at once.
+  (function () {
+    var frames = Array.prototype.slice.call(document.querySelectorAll("iframe[data-src]"));
+    if (!frames.length) return;
+
+    var smallScreen = window.matchMedia("(max-width: 767px), (pointer: coarse)").matches;
+    var MAX_LIVE = smallScreen ? 3 : 6; // hard cap on simultaneously loaded previews
+    var LOAD_AHEAD = 0.6; // start loading when within 60% of a screen height
+    var RELEASE_AFTER = 1.4; // release when more than 140% of a screen away
+
+    function setLive(frame, live) {
+      var isLive = frame.getAttribute("data-live") === "1";
+      if (live && !isLive) {
+        frame.removeAttribute("loading"); // we control timing now
+        frame.setAttribute("data-live", "1");
+        frame.src = frame.getAttribute("data-src");
+      } else if (!live && isLive) {
+        frame.setAttribute("data-live", "0");
+        frame.src = "about:blank"; // frees the page's memory, timers and animations
+      }
+    }
+
+    function evaluate() {
+      var vh = window.innerHeight || document.documentElement.clientHeight;
+      var info = frames.map(function (frame) {
+        var r = (frame.parentNode || frame).getBoundingClientRect();
+        var dist = r.top > vh ? r.top - vh : r.bottom < 0 ? -r.bottom : 0;
+        return { frame: frame, dist: dist, live: frame.getAttribute("data-live") === "1" };
+      });
+
+      info.forEach(function (it) {
+        if (it.dist <= vh * LOAD_AHEAD) setLive(it.frame, true);
+        else if (it.dist > vh * RELEASE_AFTER) setLive(it.frame, false);
+      });
+
+      // Hard cap: if too many are alive, release the ones farthest from the screen.
+      var alive = info.filter(function (it) {
+        return it.frame.getAttribute("data-live") === "1";
+      });
+      if (alive.length > MAX_LIVE) {
+        alive
+          .sort(function (a, b) {
+            return b.dist - a.dist;
+          })
+          .slice(0, alive.length - MAX_LIVE)
+          .forEach(function (it) {
+            if (it.dist > 0) setLive(it.frame, false); // never release one that's on screen
+          });
+      }
+    }
+
+    var timer = null;
+    var last = 0;
+    function schedule() {
+      if (timer) return;
+      var wait = Math.max(0, 200 - (Date.now() - last));
+      timer = setTimeout(function () {
+        timer = null;
+        last = Date.now();
+        evaluate();
+      }, wait);
+    }
+
+    window.addEventListener("scroll", schedule, { passive: true });
+    window.addEventListener("resize", schedule, { passive: true });
+    // Start after the page has settled so previews never compete with first load.
+    var start = function () {
+      setTimeout(schedule, 400);
+    };
+    if (document.readyState === "complete") start();
+    else window.addEventListener("load", start);
+  })();
 })(jQuery);

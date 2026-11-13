@@ -101,7 +101,9 @@
 
    ================================== Css table of contents End======================================== */
 /* Font Family*/
-@import url("https://fonts.googleapis.com/css2?family=Instrument+Sans:ital,wght@0,400..700;1,400..700&family=Phudu:wght@300..900&display=swap");
+/* Fonts (Instrument Sans + Phudu) are self-hosted: the @font-face rules are
+   inlined in index.html's <head> and the files live in assets/fonts/google/.
+   No third-party font request is made. */
 /* ========================= Variable Css Start ======================== */
 :root {
   /* Font Family Variable */
@@ -823,7 +825,11 @@ input[type="number"] {
 }
 
 html {
-  scroll-behavior: smooth;
+  /* Was "smooth". Native smooth-scroll on <html> fights GSAP ScrollTrigger /
+     ScrollSmoother (every internal scrollTo gets animated by the browser a
+     second time), which causes stutter and mis-timed pins. In-page link and
+     back-to-top smoothing is done in JS instead (see main.js). */
+  scroll-behavior: auto;
 }
 
 body {
@@ -5873,7 +5879,8 @@ input:focus-visible {
   inset-inline-end: 0;
   width: 100%;
   z-index: 9;
-  backdrop-filter: blur(24px);
+  /* backdrop-filter removed: the background below is fully opaque, so the
+     blur was invisible but re-ran on every scrolled frame. */
   animation: slideDown 0.35s ease-out;
   box-shadow: 0 5px 16px rgba(0, 0, 0, 0.1);
   background: #02090f;
@@ -5904,6 +5911,19 @@ input:focus-visible {
 
 .header-three {
   padding-block: 16px;
+}
+/* Native-scroll mode (phones / tablets / reduced motion). With ScrollSmoother
+   the scroll wrapper is position:fixed, so the header never pushed content
+   down and content sat underneath it. Keep exactly that layout when the
+   smoother is off by taking the header out of the document flow. */
+.tw-native-scroll .header {
+  position: absolute !important;
+  top: 0;
+  left: 0;
+  width: 100%;
+}
+.tw-native-scroll .header.fixed-header {
+  position: fixed !important;
 }
 .profile-logo {
   color: hsl(var(--heading-color));
@@ -6006,11 +6026,14 @@ input:focus-visible {
   border-radius: 16px;
   background: rgba(255, 255, 255, 0.56);
   box-shadow: 0 14px 34px rgba(22, 31, 44, 0.08);
-  backdrop-filter: blur(18px);
-  -webkit-backdrop-filter: blur(18px);
+  /* backdrop-filter: blur(18px) removed - 18 of these re-blurred the page on
+     every scrolled frame over a flat light background (no visible effect). */
   color: hsl(var(--heading-color));
   text-align: center;
-  transition: background-color 0.3s ease, color 0.3s ease, transform 0.3s ease, box-shadow 0.3s ease;
+  transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease;
+}
+[data-aos^="fade"].skill-logo {
+  transition-property: opacity, transform, background-color, color, border-color, box-shadow;
 }
 .skill-logo i {
   color: var(--main-two-600);
@@ -6030,7 +6053,8 @@ input:focus-visible {
   color: hsl(var(--heading-color));
   border-color: rgba(255, 81, 1, 0.48);
   box-shadow: 0 18px 38px rgba(22, 31, 44, 0.14), 0 0 0 4px rgba(255, 81, 1, 0.06);
-  transform: translateY(-6px);
+  transform: translateY(-6px) !important;
+  transition: transform 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94), background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease;
 }
 .skill-logo:hover img,
 .skill-logo:hover > i {
@@ -6049,34 +6073,35 @@ input:focus-visible {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  border: 1px solid rgba(0, 0, 0, 0.15);
+  border: 1px solid rgba(0, 0, 0, 0.12);
   border-radius: 50%;
-  background: hsl(var(--white));
+  background: #ffffff;
   color: hsl(var(--heading-color));
   font-size: 10px;
   font-weight: 800;
   line-height: 1;
+  transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+  cursor: pointer;
+  overflow: hidden;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
 }
-.hero-tech-stack span:nth-child(1) {
-  color: #06b6d4;
+.hero-tech-stack span:hover {
+  transform: translateY(-2px) scale(1.06);
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.14);
+  border-color: rgba(0, 0, 0, 0.24);
 }
-.hero-tech-stack span:nth-child(2) {
-  color: #7952b3;
+.hero-tech-stack span svg,
+.hero-tech-stack span img {
+  display: block;
+  width: 20px;
+  height: 20px;
+  object-fit: contain;
+  flex-shrink: 0;
+  transition: transform 0.2s ease;
 }
-.hero-tech-stack span:nth-child(3) {
-  color: #61dafb;
-  font-size: 20px;
-}
-.hero-tech-stack span:nth-child(4) {
-  color: #111827;
-  font-size: 9px;
-}
-.hero-tech-stack span:nth-child(5) {
-  color: #3178c6;
-}
-.hero-tech-stack span:nth-child(6) {
-  color: #f24e1e;
-  font-size: 18px;
+.hero-tech-stack span:hover svg,
+.hero-tech-stack span:hover img {
+  transform: scale(1.08);
 }
 .ai-tools-highlight {
   margin-top: 0;
@@ -6356,7 +6381,7 @@ input:focus-visible {
   }
 }
 .footer-navigation ul li a {
-  backdrop-filter: blur(40px);
+  /* backdrop-filter: blur(40px) removed (imperceptible over the dark footer) */
   background: rgba(255, 255, 255, 0.04);
   display: block;
   margin-block-end: 10px;
@@ -6482,8 +6507,17 @@ input:focus-visible {
     margin-inline-end: 0;
   }
 }
+/* .tw-text-15 (used here at its base 60px with no breakpoints of its own)
+   is shared by several headings, so it's not safe to change directly - scope
+   the fix to this heading only. Below ~350px, "something" and "meaningful"
+   split mid-word at 60px. */
+@media screen and (max-width: 349px) {
+  .footer-three-top-left h2 {
+    font-size: 50px;
+  }
+}
 .footer-three-top-info {
-  backdrop-filter: blur(34px);
+  /* backdrop-filter: blur(34px) removed (imperceptible over the dark footer) */
   background: rgba(255, 255, 255, 0.02);
   border: 1px solid rgba(255, 255, 255, 0.06);
 }
@@ -8509,9 +8543,23 @@ body.tw-magic-cursor #magic-cursor {
     font-size: 216px;
   }
 }
+/* Each bucket below wraps "Developer" mid-word for the narrower part of its
+   own range (the font-size was only ever tested/tuned at the wide end of
+   each bucket). One extra step part-way through each bucket keeps it on one
+   line the rest of the way down to the next bucket. */
+@media screen and (max-width: 1069px) {
+  .banner-three-title {
+    font-size: 195px;
+  }
+}
 @media screen and (max-width: 991px) {
   .banner-three-title {
     font-size: 166px;
+  }
+}
+@media screen and (max-width: 827px) {
+  .banner-three-title {
+    font-size: 140px;
   }
 }
 @media screen and (max-width: 767px) {
@@ -8519,14 +8567,32 @@ body.tw-magic-cursor #magic-cursor {
     font-size: 123px;
   }
 }
+@media screen and (max-width: 639px) {
+  .banner-three-title {
+    font-size: 105px;
+  }
+}
 @media screen and (max-width: 575px) {
   .banner-three-title {
     font-size: 88px;
   }
 }
+@media screen and (max-width: 459px) {
+  .banner-three-title {
+    font-size: 80px;
+  }
+}
 @media screen and (max-width: 424px) {
   .banner-three-title {
     font-size: 78px;
+  }
+}
+/* Below ~410px, 78px wraps "Developer" mid-word onto its own line. Step down
+   once more so the whole word stays on one line at every supported phone
+   width, down to 320px. */
+@media screen and (max-width: 409px) {
+  .banner-three-title {
+    font-size: 60px;
   }
 }
 .banner-three-left {
@@ -8612,6 +8678,62 @@ body.tw-magic-cursor #magic-cursor {
     margin: auto;
   }
 }
+/* Below 1199px the left/right hero cards are hidden (see .banner-three-left/
+   .banner-three-right above), so .banner-three-wrap only holds the centered
+   heading and button. The portrait above it is now top-anchored and capped
+   in size (see .banner-three-man), so these values are just fixed clearance
+   sized to match its capped height at each breakpoint - update both sets
+   together if either changes. */
+@media screen and (max-width: 1199px) {
+  .banner-three-wrap {
+    margin-block-start: 180px;
+  }
+}
+@media screen and (max-width: 1069px) {
+  .banner-three-wrap {
+    margin-block-start: 205px;
+  }
+}
+@media screen and (max-width: 991px) {
+  .banner-three-wrap {
+    margin-block-start: 170px;
+  }
+}
+@media screen and (max-width: 827px) {
+  .banner-three-wrap {
+    margin-block-start: 195px;
+  }
+}
+@media screen and (max-width: 767px) {
+  .banner-three-wrap {
+    margin-block-start: 150px;
+  }
+}
+@media screen and (max-width: 639px) {
+  .banner-three-wrap {
+    margin-block-start: 175px;
+  }
+}
+@media screen and (max-width: 575px) {
+  .banner-three-wrap {
+    margin-block-start: 130px;
+  }
+}
+@media screen and (max-width: 459px) {
+  .banner-three-wrap {
+    margin-block-start: 150px;
+  }
+}
+@media screen and (max-width: 424px) {
+  .banner-three-wrap {
+    margin-block-start: 105px;
+  }
+}
+@media screen and (max-width: 409px) {
+  .banner-three-wrap {
+    margin-block-start: 95px;
+  }
+}
 .banner-three-center-title {
   -webkit-text-stroke-width: 1px;
   color: hsl(var(--white));
@@ -8630,13 +8752,34 @@ body.tw-magic-cursor #magic-cursor {
 @media screen and (max-width: 575px) {
   .banner-three-center-title {
     font-size: 2rem;
+    margin-top: 30px;
   }
 }
 @media screen and (max-width: 424px) {
   .banner-three-center-title {
     font-size: 1.9rem;
+    margin-top: 15px;
   }
 }
+
+.resume-download-btn .resume-btn-icon {
+  color: var(--main-two-600);
+  transition: color 0.3s ease, transform 0.2s ease;
+  display: inline-block;
+  vertical-align: middle;
+}
+
+.resume-download-btn:hover .resume-btn-icon {
+  color: #ffffff !important;
+  transform: translateY(-2px);
+}
+
+.resume-download-btn:active .resume-btn-icon,
+.resume-download-btn:focus .resume-btn-icon {
+  color: #ffffff !important;
+  transform: scale(0.92);
+}
+
 .banner-three-line-shape {
   inset-block-end: 13%;
 }
@@ -8719,9 +8862,56 @@ body.tw-magic-cursor #magic-cursor {
    promoting the text ABOVE the portrait image even though the image is
    position:absolute. An explicit z-index here makes the image reliably win
    the stacking order regardless of what transform state the text is in. */
+
+/* Below 1199px, .banner-three-left/-right are hidden (see above), leaving
+   only the centered heading+button in the flow. The portrait was still
+   positioned with inset-block-end as a PERCENTAGE OF THE WRAPPER'S HEIGHT,
+   and that wrapper's height comes entirely from this flow content - so the
+   portrait's position and the text's position were fighting over the same
+   number, and the portrait (which keeps scaling with viewport width) ended
+   up overlapping the heading below it at every width from 320-1199px.
+   Fix: anchor the portrait from the top instead (a fixed distance into the
+   "Developer" title above it, preserving the same overlapping-the-heading
+   look as desktop), cap its size so it doesn't grow large enough to need
+   the earth, and give the row below it fixed clearance sized to match.
+   Values are tied to this file's own breakpoints for .banner-three-title
+   (font-size) and .banner-three-wrap (clearance) - if either changes,
+   recheck the portrait still clears the text below it at every width. */
+@media screen and (max-width: 1199px) {
+  .banner-three-man {
+    inset-block-end: auto;
+    top: 130px;
+    max-width: 300px;
+  }
+}
+@media screen and (max-width: 991px) {
+  .banner-three-man {
+    top: 100px;
+    max-width: 260px;
+  }
+}
+@media screen and (max-width: 767px) {
+  .banner-three-man {
+    top: 74px;
+    max-width: 220px;
+  }
+}
 @media screen and (max-width: 575px) {
   .banner-three-man {
-    inset-block-end: 38%;
+    top: 60px;
+    max-width: 180px;
+  }
+}
+@media screen and (max-width: 424px) {
+  .banner-three-man {
+    top: 47px;
+    max-width: 150px;
+  }
+}
+@media screen and (max-width: 409px) {
+  .banner-three-man {
+    top: 64px;
+    max-width: 130px;
   }
 }
 
@@ -8804,6 +8994,7 @@ body.tw-magic-cursor #magic-cursor {
     inset-block-start: -33px;
   }
 }
+
 @media screen and (max-width: 575px) {
   .about-three-title {
     font-size: 2rem;
@@ -8856,10 +9047,19 @@ body.tw-magic-cursor #magic-cursor {
     margin-block-start: 40px;
   }
 }
-@media screen and (max-width: 575px) {
+@media screen and (max-width: 767px) {
   .about-three-wrap-shape {
-    flex-wrap: wrap;
+    flex-direction: column;
     gap: 20px;
+  }
+  .about-three-wrap-shape .banner-three-counter-item:first-child {
+    align-self: flex-start;
+    margin-inline-end: auto;
+  }
+  .about-three-wrap-shape .banner-three-counter-item:nth-child(2) {
+    align-self: flex-end;
+    margin-inline-start: auto;
+    margin-block-start: 0 !important;
   }
 }
 @media screen and (max-width: 1199px) {
@@ -9185,7 +9385,7 @@ body.tw-magic-cursor #magic-cursor {
 }
 @media screen and (max-width: 1699px) {
   .portfolio-three-shape-title {
-    font-size: 555px;
+    font-size: 515px;
   }
 }
 @media screen and (max-width: 1499px) {
@@ -9543,7 +9743,14 @@ body.tw-magic-cursor #magic-cursor {
 }
 @media screen and (max-width: 1199px) {
   .service-three-title {
-    font-size: 2.6rem;
+    font-size: 2.5rem;
+  }
+}
+/* At 2.5rem, "Development" (in "Frontend Development") still wraps mid-word
+   below ~375px - same class of bug as .banner-three-title above. */
+@media screen and (max-width: 374px) {
+  .service-three-title {
+    font-size: 28px;
   }
 }
 
@@ -10483,7 +10690,9 @@ body.tw-magic-cursor #magic-cursor {
   transition: transform 0.4s ease, box-shadow 0.4s ease;
 }
 .react-project-card:hover {
-  transform: translateY(-8px);
+  /* "translate" (not "transform") so the lift works together with the AOS
+     reveal, which owns the transform property and would otherwise override it. */
+  translate: 0 -8px;
   box-shadow: 0 18px 36px rgba(2, 9, 15, 0.14), -4px -4px 0 rgba(255, 255, 255, 0.45);
 }
 .react-project-preview {
@@ -10507,7 +10716,8 @@ body.tw-magic-cursor #magic-cursor {
   transition: transform 0.6s ease;
 }
 .react-project-card:hover .react-project-preview img { transform: scale(1.05); }
-.react-project-card:hover .react-project-preview::after { opacity: 0.8; }
+.react-project-card:hover .react-project-preview::after,
+.portfolio-three-item:hover .react-project-preview::after { opacity: 0.8; }
 .react-project-iframe-wrap {
   width: 100%;
   height: 100%;
@@ -10527,7 +10737,8 @@ body.tw-magic-cursor #magic-cursor {
   pointer-events: none;
   transition: transform 0.6s ease;
 }
-.react-project-card:hover .react-project-iframe-wrap iframe { transform: scale(calc(var(--rp-scale, 0.25) * 1.05)); }
+.react-project-card:hover .react-project-iframe-wrap iframe,
+.portfolio-three-item:hover .react-project-iframe-wrap iframe { transform: scale(calc(var(--rp-scale, 0.25) * 1.05)); }
 .react-project-browser-bar {
   position: absolute;
   z-index: 1;
@@ -10806,4 +11017,89 @@ body.tw-magic-cursor #magic-cursor {
   [data-aos="fade-right"] {
     transform: translate3d(0, 40px, 0);
   }
+}
+
+/* AOS reduced-motion safety net:
+   main.js already skips AOS.init() and strips every data-aos* attribute for
+   prefers-reduced-motion users (so this rule is not load-bearing in normal
+   operation). It stays as a defensive fallback only - e.g. a brief instant
+   before that JS runs, or if a future edit calls AOS.init() unconditionally
+   - so reduced-motion visitors are never left looking at a hidden element. */
+@media (prefers-reduced-motion: reduce) {
+  [data-aos] {
+    transition: none !important;
+    animation: none !important;
+    transform: none !important;
+    opacity: 1 !important;
+  }
+}
+
+/* =====================================================================
+   #projects (Professional Projects) - clean equal-height card grid
+   The old layout offset every even card by 617px (built for tall theme
+   images), which left huge empty gaps once the cards became live previews,
+   and its "works" watermark was invisible. Cards now match the Frontend
+   Projects cards above.
+   ===================================================================== */
+.portfolio-three-area { overflow-x: clip; }
+.portfolio-three-area .portfolio-three-wrapper {
+  display: grid !important;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 32px;
+  align-items: stretch;
+}
+.portfolio-three-area .portfolio-three-item,
+.portfolio-three-area .portfolio-three-item:nth-child(even) {
+  display: flex;
+  flex-direction: column;
+  max-width: none;
+  width: 100%;
+  margin: 0 !important;
+  padding: 30px 34px 34px;
+  overflow: hidden;
+  transition: translate 0.4s ease, box-shadow 0.4s ease;
+}
+.portfolio-three-area .portfolio-three-item:hover {
+  translate: 0 -8px;
+  box-shadow: 0 18px 36px rgba(2, 9, 15, 0.14), -4px -4px 0 rgba(255, 255, 255, 0.45);
+}
+.portfolio-three-area .portfolio-three-wrap {
+  flex-wrap: nowrap !important; /* bootstrap's .flex-wrap is !important */
+  align-items: flex-start;
+  gap: 16px;
+  margin-bottom: 24px;
+}
+.portfolio-three-area .portfolio-three-wrap h2 {
+  font-size: clamp(24px, 2.2vw, 36px);
+  line-height: 1.1;
+}
+.portfolio-three-area .portfolio-three-wrap > div:first-child { margin-bottom: 0 !important; min-width: 0; }
+.portfolio-three-area .portfolio-three-button { flex-shrink: 0; }
+.portfolio-three-area .portfolio-thumb {
+  margin-top: auto;
+  overflow: hidden;
+  border-radius: 0;
+}
+.portfolio-three-area .portfolio-thumb .react-project-preview { border-radius: 0; }
+
+/* "works" watermark: outlined, faint, centred behind the cards */
+.portfolio-three-shape {
+  inset-inline: 0;
+  top: 60px;
+  text-align: center;
+  pointer-events: none;
+}
+.portfolio-three-shape .portfolio-three-shape-title {
+  margin: 0;
+  line-height: 0.8;
+  font-size: clamp(110px, 19vw, 360px);
+  text-transform: uppercase;
+  color: transparent;
+  -webkit-text-stroke: 1.5px rgba(2, 9, 15, 0.06);
+}
+@media screen and (max-width: 991px) {
+  .portfolio-three-area .portfolio-three-wrapper { grid-template-columns: minmax(0, 1fr); gap: 24px; }
+  .portfolio-three-area .portfolio-three-item,
+  .portfolio-three-area .portfolio-three-item:nth-child(even) { padding: 24px 22px 26px; }
+  .portfolio-three-shape { top: 40px; }
 }
