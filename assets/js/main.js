@@ -985,7 +985,7 @@
   {
     terms: ["why hire", "why should we hire", "strength"],
     answer:
-      "Ketan's strengths include 2+ years of practical frontend experience, working with both Angular and React, strong Figma-to-code implementation, responsive design, reusable components, and comfort working with existing codebases."
+      "Ketan's strengths include 2.5+ years of practical frontend experience, working with both Angular and React, strong Figma-to-code implementation, responsive design, reusable components, and comfort working with existing codebases."
   },
 
   {
