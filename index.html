@@ -79,11 +79,36 @@
     </div>
   </div>
   <!--==================== Preloader End ====================-->
+<body class="tw-magic-cursor">
+  <!--==================== Preloader Start ====================-->
+  <div class="preloader">
+    <svg viewBox="0 0 1000 1000" preserveAspectRatio="none">
+      <path id="preloaderSvg" d="M0,1005S175,995,500,995s500,5,500,5V0H0Z"></path>
+    </svg>
+    <div class="preloader-heading">
+      <div class="load-text">
+        <span>L</span>
+        <span>o</span>
+        <span>a</span>
+        <span>d</span>
+        <span>i</span>
+        <span>n</span>
+        <span>g</span>
+      </div>
+    </div>
+  </div>
+  <!--==================== Preloader End ====================-->
 
   <!--==================== Overlay Start ====================-->
   <div class="overlay"></div>
   <!--==================== Overlay End ====================-->
+  <!--==================== Overlay Start ====================-->
+  <div class="overlay"></div>
+  <!--==================== Overlay End ====================-->
 
+  <!--==================== Sidebar Overlay End ====================-->
+  <div class="side-overlay"></div>
+  <!--==================== Sidebar Overlay End ====================-->
   <!--==================== Sidebar Overlay End ====================-->
   <div class="side-overlay"></div>
   <!--==================== Sidebar Overlay End ====================-->
@@ -93,7 +118,15 @@
     <div id="ball"></div>
   </div>
   <!--==================== Begin Magic Cursor End ====================-->
+  <!--==================== Begin Magic Cursor Start ====================-->
+  <div id="magic-cursor">
+    <div id="ball"></div>
+  </div>
+  <!--==================== Begin Magic Cursor End ====================-->
 
+  <!-- Custom Toast Message start -->
+  <div id="toast-container"></div>
+  <!-- Custom Toast Message End -->
   <!-- Custom Toast Message start -->
   <div id="toast-container"></div>
   <!-- Custom Toast Message End -->
@@ -108,7 +141,59 @@
     </button>
   </div>
   <!-- ==================== Scroll to Top End Here ==================== -->
+  <!-- ==================== Scroll to Top End Here ==================== -->
+  <div class="back-to-top-wrapper">
+    <button id="back_to_top" type="button" class="back-to-top-btn">
+      <svg width="12" height="7" viewBox="0 0 12 7" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M11 6L6 1L1 6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"
+          stroke-linejoin="round" />
+      </svg>
+    </button>
+  </div>
+  <!-- ==================== Scroll to Top End Here ==================== -->
 
+  <!-- ==================== Offcanvus Mobile Menu Start Here ==================== -->
+  <div class="tw-offcanvas-2-area p-relative">
+    <div class="tw-offcanvas-2-bg is-left left-box"></div>
+    <div class="tw-offcanvas-2-bg is-right right-box d-none d-md-block"></div>
+    <div class="tw-offcanvas-2-wrapper">
+      <div class="tw-offcanvas-2-left left-box">
+        <div class="tw-offcanvas-2-left-wrap d-flex justify-content-between align-items-center">
+          <div class="twoffcanvas__logo">
+            <a class="logo-1" href="#home"><span class="profile-logo">KETAN <strong>MALI</strong></span></a>
+          </div>
+          <div class="tw-offcanvas-2-close d-md-none text-end">
+            <button class="tw-offcanvas-2-close-btn tw-offcanvas-2-close-btn">
+              <span class="text">
+                <span class="text-white">close</span>
+              </span>
+              <span class="d-inline-block">
+                <span>
+                  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <rect width="32.621" height="1.00918"
+                      transform="matrix(0.704882 0.709325 -0.704882 0.709325 1.0061 0)" fill="currentcolor" />
+                    <rect width="32.621" height="1.00918"
+                      transform="matrix(0.704882 -0.709325 0.704882 0.709325 0 23.2842)" fill="currentcolor" />
+                  </svg>
+                </span>
+              </span>
+            </button>
+          </div>
+        </div>
+        <div class="tw-main-menu-mobile menu-hover-active counter-row">
+          <nav></nav>
+        </div>
+        <!-- The header's Download CV button (below) is hidden below 768px
+               (d-none d-md-block) to save space, and this offcanvas menu is
+               the only nav surface phones still have - without this, phone
+               visitors would have no way at all to download the resume. -->
+        <div class="d-md-none tw-mt-4">
+          <a class="tw-hover-btn bg-black text-white fw-bold tw-py-4 tw-px-10 d-inline-block hover-text-white text-uppercase tw-rounded-md"
+            href="assets/Mali_Ketan_Frontend_UI_Developer_2-5_Years.pdf" download="Mali_Ketan_Frontend_UI_Developer_2-5_Years.pdf"
+            aria-label="Download Ketan Mali CV (PDF)">
+            download cv
+            <span class="tw-hover-btn-circle-dot bg-main-two-600"></span>
+          </a>
   <!-- ==================== Offcanvus Mobile Menu Start Here ==================== -->
   <div class="tw-offcanvas-2-area p-relative">
     <div class="tw-offcanvas-2-bg is-left left-box"></div>
@@ -224,6 +309,78 @@
     </div>
   </div>
   <!-- ==================== Offcanvus Mobile Menu End Here ==================== -->
+      </div>
+      <div class="tw-offcanvas-2-right right-box d-none d-md-block p-relative">
+        <div class="tw-offcanvas-2-close text-end">
+          <button class="tw-offcanvas-2-close-btn">
+            <span class="text">
+              <span>close</span>
+            </span>
+            <span class="d-inline-block">
+              <span>
+                <svg width="38" height="38" viewBox="0 0 38 38" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <path d="M9.80859 9.80762L28.1934 28.1924" stroke="currentColor" stroke-width="1.5"
+                    stroke-linecap="round" stroke-linejoin="round" />
+                  <path d="M9.80859 28.1924L28.1934 9.80761" stroke="currentColor" stroke-width="1.5"
+                    stroke-linecap="round" stroke-linejoin="round" />
+                </svg>
+              </span>
+            </span>
+          </button>
+        </div>
+        <div class="tw-offcanvas-2-right-inner d-flex flex-column justify-content-between h-100">
+          <div class="twoffcanvas__contact-info">
+            <div class="twoffcanvas__contact-title">
+              <h5 class="text-white">Contact us</h5>
+            </div>
+            <ul>
+              <li>
+                <span class="text-main-two-600 tw-text-xl"><i class="ph ph-map-pin-line"></i></span>
+                <a class="text-white" href="https://www.google.com/maps/place/Pune,+Maharashtra" target="_blank">Pune,
+                  Maharashtra, India</a>
+              </li>
+              <li>
+                <span class="text-main-two-600 tw-text-xl"><i class="ph ph-envelope"></i></span>
+                <a class="text-white" href="mailto:ketanmali.connect@gmail.com"><span
+                    class="__cf_email__">ketanmali.connect@gmail.com</span></a>
+              </li>
+              <li>
+                <span class="text-main-two-600 tw-text-xl"><i class="ph ph-phone-call"></i></span>
+                <a class="text-white" href="tel:+917038249592">+91 7038249592</a>
+              </li>
+            </ul>
+          </div>
+          <div class="footer-social" data-aos="fade-up" data-aos-duration="1000" data-aos-delay="200">
+            <ul class="tw-gap-2">
+              <li>
+                <a href="https://github.com/KetuVUMali" target="_blank" rel="noopener noreferrer">
+                  <span class="active-media d-flex align-items-center tw-gap-1">GitHub <i
+                      class="ph ph-arrow-bend-up-right"></i></span>
+                  <span class="hover-media"><i class="ph ph-github-logo"></i></span>
+                </a>
+              </li>
+              <li>
+                <a href="mailto:ketanmali.connect@gmail.com" target="_blank" rel="noopener noreferrer">
+                  <span class="active-media d-flex align-items-center tw-gap-1">EMAIL <i
+                      class="ph ph-arrow-bend-up-right"></i></span>
+                  <span class="hover-media"><i class="ph ph-envelope-simple"></i></span>
+                </a>
+              </li>
+              <li>
+                <a href="https://www.linkedin.com/in/mali-ketan-vijay-4b90a3201/" target="_blank"
+                  rel="noopener noreferrer">
+                  <span class="active-media d-flex align-items-center tw-gap-1">LINKEDIN <i
+                      class="ph ph-arrow-bend-up-right"></i></span>
+                  <span class="hover-media"><i class="ph ph-linkedin-logo"></i></span>
+                </a>
+              </li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <!-- ==================== Offcanvus Mobile Menu End Here ==================== -->
 
   <!-- ==================== Header Start Here ==================== -->
   <header class="header header-two header-three tw-transition-all tw-z-99 position-relative">
@@ -236,7 +393,42 @@
           </a>
         </div>
         <!-- Logo End  -->
+  <!-- ==================== Header Start Here ==================== -->
+  <header class="header header-two header-three tw-transition-all tw-z-99 position-relative">
+    <div class="container tw-container-1800-px">
+      <nav class="d-flex align-items-center justify-content-between position-relative">
+        <!-- Logo Start -->
+        <div class="header-three-logo tw-rounded-md">
+          <a href="#home" class="link">
+            <span class="profile-logo">KETAN <strong>MALI</strong></span>
+          </a>
+        </div>
+        <!-- Logo End  -->
 
+        <!-- Menu Start  -->
+        <div class="header-three-social d-none d-lg-block">
+          <ul class="d-flex tw-gap-205">
+            <li>
+              <a class="tw-w-13 tw-h-13 lh-1 d-inline-flex justify-content-center align-items-center text-heading tw-text-xl tw-rounded-md"
+                href="https://github.com/KetuVUMali" target="_blank" rel="noopener noreferrer"><i
+                  class="ph-bold ph-github-logo"></i></a>
+            </li>
+            <li>
+              <a class="tw-w-13 tw-h-13 lh-1 d-inline-flex justify-content-center align-items-center text-heading tw-text-xl tw-rounded-md"
+                href="https://www.linkedin.com/in/mali-ketan-vijay-4b90a3201/" target="_blank"
+                rel="noopener noreferrer"><i class="ph-bold ph-linkedin-logo"></i></a>
+            </li>
+            <li>
+              <a class="tw-w-13 tw-h-13 lh-1 d-inline-flex justify-content-center align-items-center text-heading tw-text-xl tw-rounded-md"
+                href="mailto:ketanmali.connect@gmail.com"><i class="ph-bold ph-envelope-simple"></i></a>
+            </li>
+            <li>
+              <a class="tw-w-13 tw-h-13 lh-1 d-inline-flex justify-content-center align-items-center text-heading tw-text-xl tw-rounded-md"
+                href="tel:+917038249592"><i class="ph-bold ph-phone-call"></i></a>
+            </li>
+          </ul>
+        </div>
+        <!-- Menu End  -->
         <!-- Menu Start  -->
         <div class="header-three-social d-none d-lg-block">
           <ul class="d-flex tw-gap-205">
@@ -389,7 +581,29 @@
             </button>
           </div>
           <!-- Menu Button End  -->
+        <!-- Header Right start -->
+        <div class="header-right d-flex align-items-center tw-gap-705">
+          <!-- Menu Button Start  -->
+          <div class="header-three-menu">
+            <button
+              class="tw-offcanvas-open-btn tw-w-13 tw-h-13 lh-1 d-inline-flex justify-content-center align-items-center tw-transition-3 tw-rounded-md">
+              <span><img class="tw-transition-3" src="assets/images/icons/header-three-toggle.svg"
+                  alt="toggle" /></span>
+            </button>
+          </div>
+          <!-- Menu Button End  -->
 
+          <!-- Header Button Start  -->
+          <div class="header-three-button d-none d-md-block">
+            <a class="tw-hover-btn bg-black text-white fw-bold tw-py-4 tw-px-10 d-inline-block hover-text-white text-uppercase tw-rounded-md"
+              href="assets/Mali_Ketan_Frontend_UI_Developer_2-5_Years.pdf" download="Mali_Ketan_Frontend_UI_Developer_2-5_Years.pdf"
+              aria-label="Download Ketan Mali CV (PDF)">
+              download cv
+              <span class="tw-hover-btn-circle-dot bg-main-two-600"></span>
+            </a>
+          </div>
+          <!-- Header Button End  -->
+        </div>
           <!-- Header Button Start  -->
           <div class="header-three-button d-none d-md-block">
             <a class="tw-hover-btn bg-black text-white fw-bold tw-py-4 tw-px-10 d-inline-block hover-text-white text-uppercase tw-rounded-md"
@@ -2138,4 +2352,5 @@
   </div>
 </body>
 
+</html>
 </html>
