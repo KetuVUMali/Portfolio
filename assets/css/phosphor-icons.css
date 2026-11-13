@@ -1,0 +1,222 @@
+/* Phosphor Icons (regular + bold) - self-hosted.
+   Previously loaded at runtime from unpkg.com via assets/js/phosphor-icon.js;
+   that CDN request is blocked by many ad-blockers, privacy extensions and
+   corporate networks, and even when it succeeds it can't start until this
+   script has been reached and executed, well after the page's own CSS.
+   Self-hosting removes that dependency and every point-of-failure it added,
+   with the exact same icons and appearance.
+   Source: @phosphor-icons/web v2.1.1 (MIT license, see LICENSE-phosphor.txt) */
+
+@font-face {
+  font-family: "Phosphor";
+  src: url("../fonts/phosphor/Phosphor.woff2") format("woff2");
+  font-weight: normal;
+  font-style: normal;
+  font-display: block;
+}
+
+.ph {
+  /* use !important to prevent issues with browser extensions that change fonts */
+  font-family: "Phosphor" !important;
+  speak: never;
+  font-style: normal;
+  font-weight: normal;
+  font-variant: normal;
+  text-transform: none;
+  line-height: 1;
+
+  /* Enable Ligatures ================ */
+  letter-spacing: 0;
+  -webkit-font-feature-settings: "liga";
+  -moz-font-feature-settings: "liga=1";
+  -moz-font-feature-settings: "liga";
+  -ms-font-feature-settings: "liga" 1;
+  font-feature-settings: "liga";
+  -webkit-font-variant-ligatures: discretionary-ligatures;
+  font-variant-ligatures: discretionary-ligatures;
+
+  /* Better Font Rendering =========== */
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+
+.ph.ph-arrow-bend-up-right:before {
+  content: "\e026";
+}
+.ph.ph-arrow-down:before {
+  content: "\e03e";
+}
+.ph.ph-arrow-right:before {
+  content: "\e06c";
+}
+.ph.ph-arrow-up:before {
+  content: "\e08e";
+}
+.ph.ph-arrow-up-right:before {
+  content: "\e092";
+}
+.ph.ph-browsers:before {
+  content: "\e0f6";
+}
+.ph.ph-bug:before {
+  content: "\e5f4";
+}
+.ph.ph-caret-left:before {
+  content: "\e138";
+}
+.ph.ph-caret-right:before {
+  content: "\e13a";
+}
+.ph.ph-chat-circle-dots:before {
+  content: "\e16c";
+}
+.ph.ph-database:before {
+  content: "\e1de";
+}
+.ph.ph-device-mobile:before {
+  content: "\e1e0";
+}
+.ph.ph-envelope:before {
+  content: "\e214";
+}
+.ph.ph-envelope-simple:before {
+  content: "\e218";
+}
+.ph.ph-eye:before {
+  content: "\e220";
+}
+.ph.ph-file-arrow-down:before {
+  content: "\e232";
+}
+.ph.ph-github-logo:before {
+  content: "\e576";
+}
+.ph.ph-linkedin-logo:before {
+  content: "\e2ee";
+}
+.ph.ph-map-pin-line:before {
+  content: "\e318";
+}
+.ph.ph-phone-call:before {
+  content: "\e3ba";
+}
+.ph.ph-play:before {
+  content: "\e3d0";
+}
+.ph.ph-sparkle:before {
+  content: "\e6a2";
+}
+.ph.ph-star:before {
+  content: "\e46a";
+}
+.ph.ph-x:before {
+  content: "\e4f6";
+}
+
+@font-face {
+  font-family: "Phosphor-Bold";
+  src: url("../fonts/phosphor/Phosphor-Bold.woff2") format("woff2");
+  font-weight: normal;
+  font-style: normal;
+  font-display: block;
+}
+
+.ph-bold {
+  /* use !important to prevent issues with browser extensions that change fonts */
+  font-family: "Phosphor-Bold" !important;
+  speak: never;
+  font-style: normal;
+  font-weight: normal;
+  font-variant: normal;
+  text-transform: none;
+  line-height: 1;
+
+  /* Enable Ligatures ================ */
+  letter-spacing: 0;
+  -webkit-font-feature-settings: "liga";
+  -moz-font-feature-settings: "liga=1";
+  -moz-font-feature-settings: "liga";
+  -ms-font-feature-settings: "liga" 1;
+  font-feature-settings: "liga";
+  -webkit-font-variant-ligatures: discretionary-ligatures;
+  font-variant-ligatures: discretionary-ligatures;
+
+  /* Better Font Rendering =========== */
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+
+.ph-bold.ph-arrow-bend-up-right:before {
+  content: "\e026";
+}
+.ph-bold.ph-arrow-down:before {
+  content: "\e03e";
+}
+.ph-bold.ph-arrow-right:before {
+  content: "\e06c";
+}
+.ph-bold.ph-arrow-up:before {
+  content: "\e08e";
+}
+.ph-bold.ph-arrow-up-right:before {
+  content: "\e092";
+}
+.ph-bold.ph-browsers:before {
+  content: "\e0f6";
+}
+.ph-bold.ph-bug:before {
+  content: "\e5f4";
+}
+.ph-bold.ph-caret-left:before {
+  content: "\e138";
+}
+.ph-bold.ph-caret-right:before {
+  content: "\e13a";
+}
+.ph-bold.ph-chat-circle-dots:before {
+  content: "\e16c";
+}
+.ph-bold.ph-database:before {
+  content: "\e1de";
+}
+.ph-bold.ph-device-mobile:before {
+  content: "\e1e0";
+}
+.ph-bold.ph-envelope:before {
+  content: "\e214";
+}
+.ph-bold.ph-envelope-simple:before {
+  content: "\e218";
+}
+.ph-bold.ph-eye:before {
+  content: "\e220";
+}
+.ph-bold.ph-file-arrow-down:before {
+  content: "\e232";
+}
+.ph-bold.ph-github-logo:before {
+  content: "\e576";
+}
+.ph-bold.ph-linkedin-logo:before {
+  content: "\e2ee";
+}
+.ph-bold.ph-map-pin-line:before {
+  content: "\e318";
+}
+.ph-bold.ph-phone-call:before {
+  content: "\e3ba";
+}
+.ph-bold.ph-play:before {
+  content: "\e3d0";
+}
+.ph-bold.ph-sparkle:before {
+  content: "\e6a2";
+}
+.ph-bold.ph-star:before {
+  content: "\e46a";
+}
+.ph-bold.ph-x:before {
+  content: "\e4f6";
+}
